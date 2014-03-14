@@ -63,12 +63,12 @@ char *WSLget_text (yyscan_t yyscanner );
 }
 
 +(NSString*)convertHTMLtoString:(NSString*)html scanner:(yyscan_t)scanner {
-    if (! [html canBeConvertedToEncoding:NSISOLatin1StringEncoding]) {
+    if (! [html canBeConvertedToEncoding:NSUTF8StringEncoding]) {
         // if it's not UTF8 I'm not sure what to do with it...
         return html;
     }
     
-    const char* text = [html cStringUsingEncoding:NSISOLatin1StringEncoding];
+    const char* text = [html cStringUsingEncoding:NSUTF8StringEncoding];
     
     WSL_scan_string(text, scanner);
     int expression;
@@ -78,7 +78,7 @@ char *WSLget_text (yyscan_t yyscanner );
         switch (expression) {
             case WSL_ENTITY_NOMATCH:
                 [output appendFormat:@"%@", [NSString stringWithCString:WSLget_text(scanner)
-                                                               encoding:NSISOLatin1StringEncoding]];
+                                                               encoding:NSUTF8StringEncoding]];
                 break;
             case WSL_ENTITY_NUMBER:
                 expression = atoi(&WSLget_text(scanner)[2]);
