@@ -68,7 +68,7 @@ char *WSLget_text (yyscan_t yyscanner );
         return html;
     }
     
-    const char* text = [html cStringUsingEncoding:NSUTF8StringEncoding];
+    const char* text = [html UTF8String];
     
     WSL_scan_string(text, scanner);
     int expression;
@@ -76,10 +76,14 @@ char *WSLget_text (yyscan_t yyscanner );
     while ((expression = WSLlex(scanner))) {
         // TODO: there has to be a more efficient way of doing this...
         switch (expression) {
-            case WSL_ENTITY_NOMATCH:
-                [output appendFormat:@"%@", [NSString stringWithCString:WSLget_text(scanner)
-                                                               encoding:NSUTF8StringEncoding]];
+            case WSL_ENTITY_NOMATCH: {
+                const char *str = WSLget_text(scanner);
+                NSString *s = [NSString stringWithUTF8String:str];
+                if (s != nil) {
+                    [output appendString:s];
+                }
                 break;
+            }
             case WSL_ENTITY_NUMBER:
                 expression = atoi(&WSLget_text(scanner)[2]);
                 // fall through so expression is added to string
